@@ -11,10 +11,13 @@
 
 ## Quickstart
 
+Run the prebuilt image from GitHub Container Registry — no clone needed:
+
 ```bash
-git clone https://github.com/derKater/ocr-everything.git
-cd ocr-everything
-docker compose up -d --build
+mkdir ocr-everything && cd ocr-everything
+curl -O https://raw.githubusercontent.com/derKater86/ocr-everything/main/docker-compose.yml
+docker compose pull
+docker compose up -d
 ```
 
 The API is then available at **http://localhost:5555**.
@@ -34,9 +37,41 @@ Interactive Swagger docs: **http://localhost:5555/docs**
 - [Docker](https://docs.docker.com/get-docker/) (>= 20.10)
 - [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
 
-### Build & Run
+### Option A — Docker Compose (recommended)
+
+Use the prebuilt image from [GitHub Container Registry](https://github.com/derKater86/ocr-everything/pkgs/container/ocr-everything):
 
 ```bash
+curl -O https://raw.githubusercontent.com/derKater86/ocr-everything/main/docker-compose.yml
+docker compose pull
+docker compose up -d
+```
+
+The compose file:
+- pulls `ghcr.io/derkater86/ocr-everything:latest`
+- exposes port **5555** on the host (mapped to container port `8000`)
+- adds a healthcheck against `/health`
+- restarts automatically unless explicitly stopped
+
+To update later:
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+To stop:
+
+```bash
+docker compose down
+```
+
+### Option B — Build from source
+
+For development or customization, clone and build locally:
+
+```bash
+git clone https://github.com/derKater86/ocr-everything.git
+cd ocr-everything
 docker compose up -d --build
 ```
 
@@ -45,14 +80,11 @@ This builds an image based on `python:3.12-slim` with:
 - `poppler-utils` (for PDF rendering)
 - the FastAPI app
 
-By default the service is exposed on host port **5555** (mapped to container port `8000`).
-You can change the host port in [docker-compose.yml](docker-compose.yml).
+Because the compose file declares both `image:` and `build:`, `docker compose up --build` produces a local image tagged as `ghcr.io/derkater86/ocr-everything:latest` — `docker compose up` afterwards reuses it without pulling.
 
-### Stop
+### Changing the host port
 
-```bash
-docker compose down
-```
+Edit [docker-compose.yml](docker-compose.yml) — change the left side of `"5555:8000"` to whatever port you want exposed on the host.
 
 ## How to Use
 

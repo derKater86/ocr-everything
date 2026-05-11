@@ -1,10 +1,16 @@
 services:
   ocr-api:
+    image: ghcr.io/derkater86/ocr-everything:latest
     build: .
+    container_name: ocr-everything
     ports:
       - "5555:8000"
-    volumes:
-      - ./app:/app/app
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
